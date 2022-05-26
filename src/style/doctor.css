@@ -1,0 +1,73 @@
+.doctors-head{
+    display: flex;
+    width: 95%;
+    margin: 0 auto;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 10vh;
+    padding: 20px;
+}
+.doctors-head h2{
+    margin: 0;
+}
+.delete-doctors{
+    font-size: 16px;
+    color: red;
+    margin-right: 30px;
+    /* border: 1px solid red; */
+    cursor: pointer;
+}
+.edit-doctors{
+    font-size: 16px;
+    color: green;
+    /* border: 1px solid green; */
+    cursor: pointer;
+}
+.doctors-search{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+}
+.btn-none{
+    display: none;
+}
+
+.doctor-btns{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.doctor-btns button{
+    padding: 2px 12px;
+    border-radius: 4px;
+}
+.batafsil-doctor{
+    width: 100%;
+}
+.batafsil-doctor tr{
+    border: 1px solid #F0F2F5;
+ 
+}
+
+.batafsil-doctor th{
+    width: 30%;
+}
+.batafsil-doctor td{
+    flex: 1 1 auto;
+    width: 100%;
+}
+.batafsil-doctor td, .batafsil-doctor th{
+    padding: 10px 20px;
+}
+.doktor-info-modal .ant-modal-footer button{
+    display: none;
+}
+.batafsil-doctor-add input{
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #F0F2F5;
+}
+.ck-editor__editable {
+    min-height: 500px;
+}
