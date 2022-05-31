@@ -88,7 +88,7 @@ const UserP = () => {
         setSpecializationDirections(res.data);
       })
     }).catch((err) => { })
-  }, [])
+  }, [academicTitle])
   // upload img
   const [fileList, setFileList] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);

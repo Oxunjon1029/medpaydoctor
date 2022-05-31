@@ -3,7 +3,7 @@ import { Button, Radio, Table } from "antd";
 // var Stomp = require("stompjs");
 
 const HomeP = () => {
-  const [doctorSchedule, setDoctorSchedule] = useState([]);
+  const [doctorSchedule] = useState([]);
   const [Times, setTimes] = useState([]);
   const [size, setSize] = useState();
   // const [doctorID, setDoctorID] = useState("");
@@ -40,7 +40,7 @@ const HomeP = () => {
     });
     let newtimeobj = {};
     newtimeobj[el.time] = el.Status;
-    let active = localStorage.getItem("activeId");
+    // let active = localStorage.getItem("activeId");
     // object = {
     //   doctorId: doctorID,
     //   doctorSchedule: [
