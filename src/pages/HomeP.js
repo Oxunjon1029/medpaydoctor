@@ -41,15 +41,15 @@ const HomeP = () => {
     let newtimeobj = {};
     newtimeobj[el.time] = el.Status;
     let active = localStorage.getItem("activeId");
-    object = {
-      doctorId: doctorID,
-      doctorSchedule: [
-        {
-          timetableObjectId: active,
-          times: newtimeobj,
-        },
-      ],
-    };
+    // object = {
+    //   doctorId: doctorID,
+    //   doctorSchedule: [
+    //     {
+    //       timetableObjectId: active,
+    //       times: newtimeobj,
+    //     },
+    //   ],
+    // };
     setTimes(times2);
     // DoctorScheduleMakeBusy(object).then((res) => {
     //   GetSchedule(doctorID);
@@ -112,7 +112,7 @@ const HomeP = () => {
     //     });
     //   });
     // }
-  }, [doctorID]);
+  }, []);
   // const GetSchedule = (id) => {
   //   DoctorSchedule(id).then((res) => {
   //     setDoctorID(res.data.doctorId);
@@ -179,7 +179,7 @@ const HomeP = () => {
             scroll={{ x: 200 }}
             className="w-100"
             dataSource={Times}
-            loading={loading}
+            // loading={loading}
           ></Table>
         </div>
       </div>
