@@ -1,7 +1,5 @@
-import { message } from "antd";
 import axios from "axios";
-import { API_URL, headers, TOKEN } from "../assets/constants";
-import { deleteCookie } from "../functions/useCookies";
+import { API_URL, headers } from "../assets/constants";
 
 export let axiosInstance = axios.create({
   baseURL: `${API_URL}`,

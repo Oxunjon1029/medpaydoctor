@@ -1,5 +1,4 @@
-import axios from 'axios'
-import { API_URL } from '../../assets/constants';
+
 import { axiosInstance } from '../host';
 export const loginUser = (data) => {
   const config = {

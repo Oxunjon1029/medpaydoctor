@@ -14,7 +14,7 @@ import {
 import { userEdit, userGet } from "../server/config/user";
 import { GetAllLang, GetLanguageConfig } from "../server/config/lang";
 import { GetSpecializationDirections, Speciality, Specializations } from "../server/config/speciality";
-import { deleteFile, fileUpload } from "../server/config/fileUpload";
+import { deleteFile } from "../server/config/fileUpload";
 import Text from "antd/lib/typography/Text";
 import moment from "moment";
 const { Option } = Select;

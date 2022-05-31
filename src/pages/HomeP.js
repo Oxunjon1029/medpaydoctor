@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, Radio, Table } from "antd";
-import {
-  DoctorSchedule,
-  DoctorScheduleMakeBusy,
-} from "../server/config/schedule";
-import { userGet } from "../server/config/user";
-import SockJS from "sockjs-client";
-import { WEB_SOCKET_URL } from "../assets/constants";
-import { getCookie } from "../functions/useCookies";
 // var Stomp = require("stompjs");
 
 const HomeP = () => {
   const [doctorSchedule, setDoctorSchedule] = useState([]);
   const [Times, setTimes] = useState([]);
   const [size, setSize] = useState();
-  const [doctorID, setDoctorID] = useState("");
-  const [loading, setLoading] = useState(true);
+  // const [doctorID, setDoctorID] = useState("");
+  // const [loading, setLoading] = useState(true);
   const handleSizeChange = (e) => {
     setSize(e.target.value);
     localStorage.setItem("activeId", e.target.value);
@@ -35,7 +27,7 @@ const HomeP = () => {
   };
 
   const isBusy = (el) => {
-    let object = {};
+    // let object = {};
     const times2 = Times;
     times2.forEach((item) => {
       if (item.time === el.time) {
