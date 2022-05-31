@@ -23,41 +23,48 @@ const LoginP = () => {
   const [loginForm] = Form.useForm();
 
   const onFinish = (values) => {
+    console.log(values);
     setSubmitting(true);
     loginUser(values)
       .then((res) => {
+        console.log('asd', res);
         if (res && res.status === 200 && res.data) {
-          setCookie(TOKEN, res.data.access_token);
+          console.log(res.data.token);
+          setCookie(TOKEN, res.data.token);
           const headers = {
-            "X-Requested-With": "XMLHttpRequest",
-            "Content-Type": "application/json; charset=utf-8",
-            Authorization: `Bearer ${res.data.access_token}`,
+            "Accept": "application/json",
+            Authorization: `Bearer ${res.data.token}`,
           };
           axios
-            .get(API_URL + "doctor/me", {
-              headers,
+          .get(API_URL + "doctor/information/data/get", {
+            headers,
+          }).then((data) => {
+            console.log(data);
+            window.location.href = "/dashboard";
+            }).catch((err) => {
+              console.log(err);
             })
-            .then((res) => {
-              setCookie("doctorId", res.data[0].doctorId);
-              axios
-                .get(API_URL + "schedule/doctor/" + res.data[0].doctorId, {
-                  headers,
-                })
-                .then((res) => {
-                  localStorage.setItem(
-                    "activeId",
-                    res.data.doctorSchedule.length > 0 &&
-                      res.data.doctorSchedule[0].timetableObjectId
-                      ? res.data.doctorSchedule[0].timetableObjectId
-                      : null
-                  );
-                  window.location.href = "/dashboard";
-                });
-            })
-            .catch((err) => {
-              setSubmitting(false);
-              message.error(err.response.data.message, [0.5]);
-            });
+          // .then((res) => {
+          // setCookie("doctorId", res.data[0].doctorId);
+          // axios
+          //   .get(API_URL + "schedule/doctor/" + res.data[0].doctorId, {
+          //     headers,
+          //   })
+          //   .then((res) => {
+          //     // localStorage.setItem(
+          //     //   "activeId",
+          //     //   res.data.doctorSchedule.length > 0 &&
+          //     //     res.data.doctorSchedule[0].timetableObjectId
+          //     //     ? res.data.doctorSchedule[0].timetableObjectId
+          //     //     : null
+          //     // );
+          //   });
+          // })
+          // .catch((err) => {
+          //   setSubmitting(false);
+          //   message.error(err.response.data.message, [0.5]);
+          //   console.log(err);
+          // });
         } else {
           message.error(
             "Ошибка логина или пароля! Пожалуйста, попробуйте еще раз :))",
@@ -65,10 +72,12 @@ const LoginP = () => {
           );
           loginForm.resetFields();
           setSubmitting(false);
+
         }
       })
       .catch((err) => {
         setSubmitting(false);
+        console.log(err.response);
       });
   };
   return (
@@ -145,7 +154,7 @@ const LoginP = () => {
                   lineHeight: "22px",
                   fontWeight: "800",
                   boxShadow: "2px 2px 10px rgb(120,100,100)",
-                  backgroundColor:'#4998af'
+                  backgroundColor: '#4998af'
                 }}
                 disabled={isSubmitting}
                 loading={isSubmitting}>

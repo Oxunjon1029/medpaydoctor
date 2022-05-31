@@ -30,11 +30,11 @@ const LayOut = (props) => {
       Logout
     </Button>
   );
-  useEffect(() => {
-    OrderGet().then((res) => {
-      setorderlength(res.data.content.length);
-    });
-  }, [orderlenght]);
+  // useEffect(() => {
+  //   OrderGet().then((res) => {
+  //     setorderlength(res.data.content.length);
+  //   });
+  // }, [orderlenght]);
   return (
     <Layout key="layout_jsx">
       <Drawer

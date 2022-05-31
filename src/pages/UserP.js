@@ -12,11 +12,11 @@ import {
   InputNumber,
 } from "antd";
 import { userEdit, userGet } from "../server/config/user";
-import { GetLanguageConfig } from "../server/config/lang";
-import { Speciality } from "../server/config/speciality";
+import { GetAllLang, GetLanguageConfig } from "../server/config/lang";
+import { GetSpecializationDirections, Speciality, Specializations } from "../server/config/speciality";
 import { deleteFile, fileUpload } from "../server/config/fileUpload";
-import { API_URL } from "../assets/constants";
 import Text from "antd/lib/typography/Text";
+import moment from "moment";
 const { Option } = Select;
 
 const { TabPane } = Tabs;
@@ -27,76 +27,29 @@ const layout = {
 };
 
 const UserP = () => {
-  const dataProfessions = {
-    "ВРАЧ-ХИРУРГ": [
-      "общая",
-      "челюстно- лицевая",
-      "ортопедическая",
-      "протезная",
-      "пластическая",
-      "стоматологическая",
-      "колопроктологическая",
-      "гинекологическая",
-      "кардиологическая",
-      "нейрохирургия",
-      "офтальмохирургия",
-      "хирургия ЛОР органо",
-    ],
-    "ВРАЧ - АЛЛЕРГОЛОГ": ["ВРАЧ - АЛЛЕРГОЛОГ"],
-    "ВРАЧ - АНЕСТЕЗИОЛОГ - РЕАНИМАТОЛОГ": [
-      "ВРАЧ - АНЕСТЕЗИОЛОГ - РЕАНИМАТОЛОГ",
-    ],
-    "ВРАЧ - КАРДИОЛОГ": ["ВРАЧ - КАРДИОЛОГ"],
-  };
-
   const [form] = Form.useForm();
+  const [academicTitle, setAcademicTitle] = useState([]);
   useEffect(() => {
     userGet().then((res) => {
-      let data = {};
-      res.data.forEach((item) => {
-        const {
-          language,
-          imageUrl,
-          academicPosition,
-          anyWorkingExperience,
-          birthDate,
-          contactInfo,
-          diploma,
-          genderEnum,
-          internCompany,
-          patientsRecovered,
-          scientificWorks,
-          speakingLanguages,
-          specialityIdList,
-          yearsExperience,
-          doctorId,
-          ...rest
-        } = item;
-        data[language] = { ...rest };
-        setDoctorBirthDate(birthDate);
-        setDoctorDiploma(diploma);
-        setDoctorid(doctorId);
-        data = {
-          ...data,
-          imageUrl,
-          academicPosition,
-          anyWorkingExperience,
-          contactInfo,
-          diploma,
-          genderEnum,
-          internCompany,
-          patientsRecovered,
-          scientificWorks,
-          speakingLanguages,
-          specialityIdList,
-          yearsExperience,
-          doctorId,
-        };
-        setUrlImage(imageUrl);
-        setFileList([{ url: `${API_URL}files/public/${imageUrl}` }]);
-        setPreviewImage(`${API_URL}files/public/${imageUrl}`);
-      });
-      form.setFieldsValue(data);
+      const essentialData = { ...res.data.doctor, ...res.data.user }
+      let birth = moment(res.data.user.birthday, "YYYY-MM-DD");
+      setUrlImage(res.data.user?.avatar)
+      const link = res.data.user?.avatar
+      const file = {
+        uid: link,
+        name: 'image',
+        status: 'done',
+        thumbUrl: link,
+        url: link,
+      };
+
+      setAcademicTitle((item) => [
+        ...item, { id: res.data.doctor.academic_title['id'], name: res.data.doctor.academic_title['name'] }
+      ])
+      console.log(res.data.doctor.academic_title, +" " + academicTitle);
+      setFileList([file]);
+      setDoctorBirthDate(birth)
+      form.setFieldsValue(essentialData);
     });
   }, [form]);
   const [lang, setLang] = useState([]);
@@ -106,10 +59,9 @@ const UserP = () => {
     GetLanguageConfig()
       .then((res) => {
         setLang(res.data);
-        console.log(res.data);
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
       });
   }, []);
   // getspeciality
@@ -118,12 +70,25 @@ const UserP = () => {
   useEffect(() => {
     Speciality()
       .then((res) => {
-        setSpeciality(res.data.content);
+        setSpeciality(res.data);
       })
       .catch((er) => {
-        console.log(er);
+        // console.log(er);
       });
   }, []);
+  // getspecializtions
+  const [specialization, setSpecialization] = useState([])
+  const [specializtionDirections, setSpecializationDirections] = useState([]);
+  // const [specializationID, setSpecializationID] = useState("");
+  useEffect(() => {
+    Specializations().then((res) => {
+      setSpecialization(res.data)
+      // console.log(res.data[0].id);
+      GetSpecializationDirections(res.data[0].id).then((res) => {
+        setSpecializationDirections(res.data);
+      })
+    }).catch((err) => { })
+  }, [])
   // upload img
   const [fileList, setFileList] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -134,86 +99,74 @@ const UserP = () => {
     if (info.fileList.length !== 0) {
       let fileListInfo = [...info.fileList];
       setFileList(fileListInfo);
-      fileUpload(info.fileList[0].originFileObj, "files/public/")
-        .then((res) => {
-          message.success("Rasm yuklandi",[0.3])
-          setUrlImage(res.data);
-        })
-        .catch((err) => {
-          message.error("Qandaydir xatolik yuz berdi",[0.3]);
-        });
+      // fileUpload(info.fileList[0].originFileObj)
+      //   .then((res) => {
+      //     message.success("Rasm yuklandi", [0.3])
+      //     setUrlImage(res.data);
+      //   })
+      //   .catch((err) => {
+      //     message.error("Qandaydir xatolik yuz berdi", [0.3]);
+      //   });
     }
   };
   const handlePreview = () => {
     setPreviewVisible(true);
-    setPreviewImage(`${API_URL}files/public/${urlImage}`);
+    setPreviewImage(urlImage);
   };
 
   const deleteImg = () => {
     deleteFile(urlImage)
       .then(() => {
-        message.success("Rasm o'chirildi",[0.3])
+        message.success("Rasm o'chirildi", [0.3])
       })
       .catch((err) => {
-        message.error("Qandaydir xatolik yuz berdi",[0.4]);
+        message.error("Qandaydir xatolik yuz berdi", [0.4]);
       });
     setFileList([]);
   };
 
   const [doctorBirthDate, setDoctorBirthDate] = useState("");
-  const [doctorDiploma, setDoctorDiploma] = useState("");
-  const [doctorID, setDoctorid] = useState("");
 
   const onFinish = () => {
     form
       .validateFields()
-      .then((res) => {
-        const {
-          academicPosition,
-          anyWorkingExperience,
-          birthDate,
-          contactInfo,
-          diploma,
-          genderEnum,
-          internCompany,
-          patientsRecovered,
-          scientificWorks,
-          speakingLanguages,
-          specialityIdList,
-          yearsExperience,
-          doctorId,
-          ...rest
-        } = res;
-
-        const { uz, ru, ...remain } = res;
-        let data = Object.keys(rest).map((item) => {
-          return {
-            ...rest[item],
-            language: item,
-            imageUrl: urlImage,
-            diploma: diploma ? diploma : doctorDiploma,
-            doctorId: doctorId ? doctorId : doctorID,
-            ...remain,
-            birthDate: birthDate
-              ? birthDate.format("YYYY-MM-DD")
-              : doctorBirthDate,
-          };
+      .then((values) => {
+        const data = {
+          avatar: fileList,
+          specialties: values.specialty,
+          academic_title_id: values.academic_title,
+          specializations: values.specializations,
+          languages: values.languages,
+          directions: values.directions,
+          ...values
+        }
+        console.log(data);
+        userEdit(data).then((res) => {
+          message.success("Siz muvafaqqiyatli ma'lumotlaringizni yangiladingiz", [0.5]);
+        }).catch((err) => {
+          message.error(err.response.data.message)
         });
-        userEdit(data);
-        message.success("Siz muvafaqqiyatli ma'lumotlaringizni yangiladingiz",[0.5]);
       })
       .catch(() => {
         message.error(
-          "Sizni ma'lumotlaringizni yangilashda muammolar bor,qaytadan urinib ko'ring!!!",[0.5]
+          "Sizni ma'lumotlaringizni yangilashda muammolar bor,qaytadan urinib ko'ring!!!", [0.5]
         );
       });
   };
-  const [dataSpesialnost, setDataSpesialnost] = useState([]);
   const handleSpesializatsiya = (value) => {
-    setDataSpesialnost(
-      value.reduce((sum, item) => sum.concat(dataProfessions[item]), [])
-    );
-  };
+    GetSpecializationDirections(value[0]).then((res) => {
+      if (res && res.status === 200 && res.data) {
+        // setSpecializationDirections(el => el = res.data);
+      }
+    }).catch((err) => { })
+  }
+
+  const [allLang, setAllLang] = useState([]);
+  useEffect(() => {
+    GetAllLang().then((res) => {
+      setAllLang(res.data);
+    }).catch((err) => { })
+  }, [])
   return (
     <div style={{ width: "85%", margin: "0 auto" }}>
       <Form
@@ -224,18 +177,18 @@ const UserP = () => {
       >
         <Tabs defaultActiveKey="1" centered>
           <TabPane className="flex-center" tab="Asosiy malumotlari" key="1">
-            {lang.map((item, index) => (
+            {lang.map(({ url }, index) => (
               <div className="width-60" key={index}>
                 <h3 style={{ margin: "30px 0" }}>
-                  <Text code>{item}</Text> da kiritiladigan ma'lumotlar
+                  <Text code>{url}</Text> da kiritiladigan ma'lumotlar
                 </h3>
                 <Form.Item
-                  label={item === "ru" ? "Имя" : "Ismi"}
-                  name={[item, "name"]}
+                  label={url === "ru" ? "Имя" : "Ismi"}
+                  name={["fio", url]}
                   rules={[
                     { required: true, message: "Doktor ismini kiriting!" },
                   ]}
-                  key="name"
+                  key="fio"
                 >
                   <Input />
                 </Form.Item>
@@ -244,18 +197,18 @@ const UserP = () => {
             <div className="width-60">
               <Form.Item
                 label="Mutaxasislikni tanlang"
-                name="specialityIdList"
+                name="specialty"
                 rules={[
                   {
                     required: true,
                     message: "Iltimos dokrtorning mutaxasisliklarini tanlang",
                   },
                 ]}
-                key="specialityIdList"
+                key="specialty"
               >
-                <Select mode="multiple">
+                <Select mode="multiple" >
                   {speciality.map((item) => (
-                    <Option value={item.specialityId} key={item.specialityId}>
+                    <Option value={item.id} key={item.id}>
                       {item.name}
                     </Option>
                   ))}
@@ -302,200 +255,191 @@ const UserP = () => {
               </Form.Item>
               <Form.Item
                 label="Jinsi"
-                name="genderEnum"
+                name="gender"
                 rules={[{ required: true, message: "Doktor jinsini tanlang!" }]}
-                key="genderEnum"
+                key="gender"
               >
                 <Select>
-                  <Option key="MALE" value="MALE">Male</Option>
-                  <Option key="FEMALE" value="FEMALE">Female</Option>
+                  <Option key="MALE" value="male">male</Option>
+                  <Option key="FEMALE" value="female">female</Option>
                 </Select>
               </Form.Item>
             </div>
           </TabPane>
           <TabPane className="flex-center" tab="Shaxsiy malumotlari" key="4">
             <div className="width-60" key={Math.random()}>
-              <Form.Item label="Tug'ilgan sanasi:" name="birthDate" key="birthDate">
-                <DatePicker  style={{ width: "100%" }} />
+              <Form.Item label="Tug'ilgan sanasi:" key="birthday">
+                <DatePicker defaultValue={doctorBirthDate ? doctorBirthDate : ""} style={{ width: "100%" }} />
               </Form.Item>
 
               <Form.Item
                 label="Qanday tillarni biladi"
-                name="speakingLanguages"
-                key="speakingLanguages"
+                name="languages"
+                key="languages"
               >
                 <Select mode="multiple">
-                  <Option key="en" value="en">English</Option>
-                  <Option key="ru" value="ru">Rus</Option>
-                  <Option key="german" value="german">German</Option>
-                  <Option key="china" value="china">China</Option>
+                  {allLang.map((item) =>
+                  (
+                    <Option value={item.id} key={item.id}>{item.name}</Option>
+                  )
+                  )}
                 </Select>
               </Form.Item>
 
               <Form.Item
                 label="Kontakt malumotlari (tel)"
-                name="contactInfo"
-                key="contactInfo"
+                name="phone"
+                key="phone"
               >
                 <Input />
               </Form.Item>
             </div>
-            {lang.map((item, index) => (
-              <div className="width-60" key={index}>
-                <h3 style={{ margin: "30px 0" }}>
-                  <Text  code>{item}</Text> da kiritiladigan ma'lumotlar
-                </h3>
 
-                <Form.Item
-                  label={item === "ru" ? "Специализация" : "Ixtisosligi"}
-                  name={[item, "profession"]}
-                  key="profession"
-                >
-                  <Select onChange={handleSpesializatsiya} mode="multiple">
-                    {Object.keys(dataProfessions).map((item,index) => (
-                      <Option key={index} value={item}>
-                        {item}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
 
-                <Form.Item
-                  label={
-                    item === "ru"
-                      ? "Специальность"
-                      : "Doktor mutaxasisliklarini kiriting"
-                  }
-                  name={[item, "speciality"]}
-                  key="speciality"
-                >
-                  <Select mode="multiple">
-                    {dataSpesialnost.map((item,index) => (
-                      <Option key={index} value={item}>
-                        {item}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </div>
-            ))}
+
+            <Form.Item
+              name="specializations"
+              key="specializations"
+            >
+              <Select onChange={handleSpesializatsiya} mode="multiple" >
+                {specialization.map((item, index) => (
+                  <Option key={index} value={item.id}>
+                    {item.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="directions"
+              key="directions"
+            >
+              <Select mode="multiple">
+                {specializtionDirections.map((item) => (
+                  <Option key={item.id} value={item.id}>
+                    {item.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
           </TabPane>
           <TabPane className="flex-center" tab="Ta'lim jarayoni" key="2">
             <div className="width-60" key={Math.random()}>
               <Form.Item
                 label="Muaxasislik bo'yicha ish staji( Стаж работы по специальности (лет) )"
-                name="anyWorkingExperience"
-                key="anyWorkingExperience"
+                name="exactly_specialty_experience"
+                key="exactly_specialty_experience"
               >
                 <Input />
               </Form.Item>
 
               <Form.Item
                 label="Aynan shu muaxasislik bo'yicha ish staji (Стаж работы по данной специализации (лет))"
-                name="yearsExperience"
-                key="yearsExperience"
+                name="specialty_experience"
+                key="specialty_experience"
               >
                 <InputNumber />
               </Form.Item>
               <Form.Item
                 label="Qancha muddat amaliyot o'tagan( Стажировки (лет) )"
-                name="internCompany"
-                key="internCompany"
+                name="internships"
+                key="internships"
               >
                 <Input />
               </Form.Item>
 
               <Form.Item
                 label="Diplom seriyasi(Идентификационный номер диплома)"
-                name="diploma"
-                key="diploma"
+                name="diplom_series"
+                key="diplom_series"
               >
                 <Input />
               </Form.Item>
               <Form.Item
                 label="Ilmiy ishlari soni (Научные работы (количество шт)):"
-                name="scientificWorks"
-                key="scientificWorks"
+                name="scientific_works"
+                key="scientific_works"
               >
                 <Input />
               </Form.Item>
               <Form.Item
                 label="Akademik unvoni (Ученое звание):"
-                name="academicPosition"
-                key="academicPosition"
+                name="academic_title"
+                key="academic_title"
               >
                 <Select>
-                  <Option key="Dotsent" value="Dotsent">Dotsent</Option>
-                  <Option key="Professor" value="Professor">Professor</Option>
-                  <Option key="Academic" value="Academic">Academic</Option>
+                  {academicTitle.map((item) => (
+                    <Option value={item.id} key={item.id}>{item.name}</Option>
+                  ))}
                 </Select>
               </Form.Item>
             </div>
-            {lang.map((item, index) => (
+            {lang.map(({ url }, index) => (
               <div className="width-60" key={index}>
                 <h3 style={{ margin: "30px 0" }}>
-                  <Text  code>{item}</Text> da kiritiladigan ma'lumotlar
+                  <Text code>{url}</Text> da kiritiladigan ma'lumotlar
                 </h3>
 
                 <Form.Item
                   label={
-                    item === "ru"
+                    url === "ru"
                       ? "Где получил образование"
                       : "Tamomlagan bilim yurti"
                   }
-                  name={[item, "graduatedUniversity"]}
-                  key="graduatedUniversity"
+                  name={["university", url]}
+                  key="university"
                 >
                   <Input />
                 </Form.Item>
 
                 <Form.Item
                   label={
-                    item === "ru"
+                    url === "ru"
                       ? "Повышение квалификации"
                       : "Malaka oshirish joyi"
                   }
-                  name={[item, "training"]}
-                  key="training"
+                  name={["professional_development", url]}
+                  key="professional_development"
                 >
                   <Input />
                 </Form.Item>
 
                 <Form.Item
-                  label={item === "ru" ? "Ученая степень" : "Akademik darajasi"}
-                  name={[item, "academicDegree"]}
-                  key="academicDegree"
+                  label={url === "ru" ? "Ученая степень" : "Akademik darajasi"}
+                  name={["academic_degree", url]}
+                  key="academic_degree"
                 >
                   <Input />
                 </Form.Item>
 
                 <Form.Item
                   label={
-                    item === "ru"
+                    url === "ru"
                       ? "Учебные курсы"
                       : "Qanday o'quv kurslarini bitirgan"
                   }
-                  name={[item, "lessons"]}
-                  key="lessons"
+                  name={["training_courses", url]}
+                  key="training_courses"
                 >
                   <Input />
                 </Form.Item>
                 <Form.Item
                   label={
-                    item === "ru"
+                    url === "ru"
                       ? "Прежние места работы:"
                       : "Oldingi ish joyi:"
                   }
-                  name={[item, "previousWorkingClinics"]}
-                  key="previousWorkingClinics"
+                  name={["previous_workplace", url]}
+                  key="previous_workplace"
                 >
                   <Input />
                 </Form.Item>
 
                 <Form.Item
-                  label={item === "ru" ? "Грамоты:" : "Erishgan yutuqlari:"}
-                  name={[item, "trophies"]}
-                  key="trophies"
+                  label={url === "ru" ? "Грамоты:" : "Erishgan yutuqlari:"}
+                  name={["achievements", url]}
+                  key="achievements"
                 >
                   <Input />
                 </Form.Item>
@@ -506,74 +450,80 @@ const UserP = () => {
             <div className="width-60">
               <Form.Item
                 label="Davolagan bemorlari soni(Ориентировочное количество больных получивших консультацию):"
-                name="patientsRecovered"
-                key="patientsRecovered"
+                name="treated_patients"
+                key="treated_patients"
               >
                 <InputNumber />
               </Form.Item>
             </div>
-            {lang.map((item, index) => (
+            {lang.map(({ url }, index) => (
               <div className="width-60" key={index}>
                 <h3 style={{ margin: "30px 0" }}>
-                  <Text  code>{item}</Text> da kiritiladigan ma'lumotlar
+                  <Text code>{url}</Text> da kiritiladigan ma'lumotlar
                 </h3>
 
                 <Form.Item
-                  label={item === "ru" ? "Категория" : "Toifasi qanday:"}
-                  name={[item, "category"]}
+                  label={url === "ru" ? "Категория" : "Toifasi qanday:"}
+                  name={["category", url]}
                   key="category"
                 >
                   <Select>
-                    <Option value={item === "ru" ? "Высшая" : "Oliy"} key="Oliy">
-                      {item === "ru" ? "Высшая" : "Oliy"}
+                    <Option value={url
+                      === "ru" ? "Высшая" : "Oliy"} key="Oliy">
+                      {url
+                        === "ru" ? "Высшая" : "Oliy"}
                     </Option>
-                    <Option value={item === "ru" ? "Первая" : "Birinchi"} key="Birinchi">
-                      {item === "ru" ? "Первая" : "Birinchi"}
+                    <Option value={url
+                      === "ru" ? "Первая" : "Birinchi"} key="Birinchi">
+                      {url
+                        === "ru" ? "Первая" : "Birinchi"}
                     </Option>
-                    <Option value={item === "ru" ? "Вторая" : "Ikkinchi"} key="Ikkinchi">
-                      {item === "ru" ? "Вторая" : "Ikkinchi"}
+                    <Option value={url
+                      === "ru" ? "Вторая" : "Ikkinchi"} key="Ikkinchi">
+                      {url
+                        === "ru" ? "Вторая" : "Ikkinchi"}
                     </Option>
                   </Select>
                 </Form.Item>
                 <Form.Item
                   label={
-                    item === "ru"
+                    url === "ru"
                       ? "На каких видах медоборудования имеет право и квалификацию работать:"
                       : "Qanday tibbiy uskunalardan foydalana oladi:"
                   }
-                  name={[item, "medicalEquipmentAbility"]}
-                  key="medicalEquipmentAbility"
+                  name={["used_medical_equipment", url]}
+                  key="used_medical_equipment"
                 >
                   <Input />
                 </Form.Item>
                 <Form.Item
                   label={
-                    item === "ru"
+                    url === "ru"
                       ? "Какие болезни лечит:"
                       : "Qanday kasalliklarni davolagan:"
                   }
-                  name={[item, "sicknessSpeciality"]}
-                  key="sicknessSpeciality"
+                  name={["treated_diseases", url]}
+                  key="treated_diseases"
                 >
                   <Input />
                 </Form.Item>
                 <Form.Item
                   label={
-                    item === "ru"
+                    url === "ru"
                       ? "Какие лечебные процедуры проводит:"
                       : "Davolash usullari qanday:"
                   }
-                  name={[item, "treatmentProcedures"]}
-                  key="treatmentProcedures"
+                  name={["methods_treatment", url]}
+                  key="methods_treatment"
                 >
                   <Input />
                 </Form.Item>
                 <Form.Item
                   label={
-                    item === "ru" ? "Кому подчиняется:" : "Kimga bo'ysunadi:"
+                    url === "ru" ? "Кому подчиняется:" : "Kimga bo'ysunadi:"
                   }
-                  name={[item, "boss"]}
-                  key="boss"
+                  name={["to_whom_obey", url]}
+                  key="to_whom_obey"
                 >
                   <Input />
                 </Form.Item>

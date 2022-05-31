@@ -59,9 +59,9 @@ const HomeP = () => {
       ],
     };
     setTimes(times2);
-    DoctorScheduleMakeBusy(object).then((res) => {
-      GetSchedule(doctorID);
-    });
+    // DoctorScheduleMakeBusy(object).then((res) => {
+    //   GetSchedule(doctorID);
+    // });
   };
 
   const columns = [
@@ -100,56 +100,56 @@ const HomeP = () => {
   ];
 
   useEffect(() => {
-    userGet().then((res) => {
-      GetSchedule(res.data[0].doctorId);
-    });
-    if (doctorID) {
-      const soc = new SockJS(WEB_SOCKET_URL);
-      const stompClient = Stomp.over(soc);
-      stompClient.connect({}, function () {
-        stompClient.subscribe("/topic/doctor", function (msg) {
-          console.log("Salom", JSON.parse(msg.body));
-          if (
-            JSON.parse(msg.body).event === "DOCTOR" &&
-            JSON.parse(msg.body).content === getCookie("doctorId")
-          ) {
-            if (!GetSchedule(doctorID)) {
-              stompClient.disconnect()
-            }
-          }
-        });
-      });
-    }
+    // userGet().then((res) => {
+    //   GetSchedule(res.data[0].doctorId);
+    // });
+    // if (doctorID) {
+    //   const soc = new SockJS(WEB_SOCKET_URL);
+    //   const stompClient = Stomp.over(soc);
+    //   stompClient.connect({}, function () {
+    //     stompClient.subscribe("/topic/doctor", function (msg) {
+    //       console.log("Salom", JSON.parse(msg.body));
+    //       if (
+    //         JSON.parse(msg.body).event === "DOCTOR" &&
+    //         JSON.parse(msg.body).content === getCookie("doctorId")
+    //       ) {
+    //         if (!GetSchedule(doctorID)) {
+    //           stompClient.disconnect()
+    //         }
+    //       }
+    //     });
+    //   });
+    // }
   }, [doctorID]);
-  const GetSchedule = (id) => {
-    DoctorSchedule(id).then((res) => {
-      setDoctorID(res.data.doctorId);
-      setDoctorSchedule(res.data.doctorSchedule);
-      let active = localStorage.getItem("activeId");
-      setSize(active);
-      let data = Object.keys(
-        res.data.doctorSchedule.length > 0
-          ? res.data.doctorSchedule.find(
-            (el) => el.timetableObjectId === active
-          ).times
-          : {}
-      );
-      data = data.map((item, index) => {
-        return {
-          key: index,
-          time: item,
-          Status:
-            res.data.doctorSchedule.length > 0
-              ? res.data.doctorSchedule.find(
-                (el) => el.timetableObjectId === active
-              ).times[item]
-              : "",
-        };
-      });
-      setTimes(data);
-      setLoading(false);
-    });
-  };
+  // const GetSchedule = (id) => {
+  //   DoctorSchedule(id).then((res) => {
+  //     setDoctorID(res.data.doctorId);
+  //     setDoctorSchedule(res.data.doctorSchedule);
+  //     let active = localStorage.getItem("activeId");
+  //     setSize(active);
+  //     let data = Object.keys(
+  //       res.data.doctorSchedule.length > 0
+  //         ? res.data.doctorSchedule.find(
+  //           (el) => el.timetableObjectId === active
+  //         ).times
+  //         : {}
+  //     );
+  //     data = data.map((item, index) => {
+  //       return {
+  //         key: index,
+  //         time: item,
+  //         Status:
+  //           res.data.doctorSchedule.length > 0
+  //             ? res.data.doctorSchedule.find(
+  //               (el) => el.timetableObjectId === active
+  //             ).times[item]
+  //             : "",
+  //       };
+  //     });
+  //     setTimes(data);
+  //     setLoading(false);
+  //   });
+  // };
 
   return (
     <React.Fragment>

@@ -1,12 +1,11 @@
 import { axiosInstance } from '../host';
 
-export const fileUpload = (file, url) => {
+export const fileUpload = (file) => {
     const formData = new FormData();
     formData.append("file", file);
     const config = {
-        method:"post",
-        url:`${url}`,
-        data:formData
+        method: "post",
+        data: formData
     };
     return axiosInstance(config);
 };

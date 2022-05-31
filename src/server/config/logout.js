@@ -1,9 +1,9 @@
 import { axiosInstance } from "../host"
 
-export const Logout = () =>{
+export const Logout = () => {
     const config = {
-        method:'post',
-        url:`auth/logout`,
+        method: 'post',
+        url: `doctor/logout`,
     }
     return axiosInstance(config)
 }
