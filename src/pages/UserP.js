@@ -51,7 +51,7 @@ const UserP = () => {
       setDoctorBirthDate(birth)
       form.setFieldsValue(essentialData);
     });
-  }, [form]);
+  }, [form, academicTitle]);
   const [lang, setLang] = useState([]);
 
   // doctorget and getlanguage useEffect
@@ -88,7 +88,7 @@ const UserP = () => {
         setSpecializationDirections(res.data);
       })
     }).catch((err) => { })
-  }, [academicTitle])
+  }, [])
   // upload img
   const [fileList, setFileList] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
