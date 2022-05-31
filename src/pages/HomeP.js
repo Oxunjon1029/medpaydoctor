@@ -8,7 +8,7 @@ import { userGet } from "../server/config/user";
 import SockJS from "sockjs-client";
 import { WEB_SOCKET_URL } from "../assets/constants";
 import { getCookie } from "../functions/useCookies";
-var Stomp = require("stompjs");
+// var Stomp = require("stompjs");
 
 const HomeP = () => {
   const [doctorSchedule, setDoctorSchedule] = useState([]);
