@@ -50,7 +50,7 @@ const UserP = () => {
       setDoctorBirthDate(birth)
       form.setFieldsValue(essentialData);
     });
-  }, []);
+  }, [form]);
   const [lang, setLang] = useState([]);
 
   // doctorget and getlanguage useEffect
