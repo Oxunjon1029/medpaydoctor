@@ -46,12 +46,11 @@ const UserP = () => {
       setAcademicTitle((item) => [
         ...item, { id: res.data.doctor.academic_title['id'], name: res.data.doctor.academic_title['name'] }
       ])
-      console.log(res.data.doctor.academic_title, +" " + academicTitle);
       setFileList([file]);
       setDoctorBirthDate(birth)
       form.setFieldsValue(essentialData);
     });
-  }, [form, academicTitle]);
+  }, []);
   const [lang, setLang] = useState([]);
 
   // doctorget and getlanguage useEffect
@@ -197,7 +196,7 @@ const UserP = () => {
             <div className="width-60">
               <Form.Item
                 label="Mutaxasislikni tanlang"
-                name="specialty"
+                // name="specialty"
                 rules={[
                   {
                     required: true,
@@ -274,7 +273,6 @@ const UserP = () => {
 
               <Form.Item
                 label="Qanday tillarni biladi"
-                name="languages"
                 key="languages"
               >
                 <Select mode="multiple">
@@ -298,7 +296,6 @@ const UserP = () => {
 
 
             <Form.Item
-              name="specializations"
               key="specializations"
             >
               <Select onChange={handleSpesializatsiya} mode="multiple" >
@@ -311,7 +308,6 @@ const UserP = () => {
             </Form.Item>
 
             <Form.Item
-              name="directions"
               key="directions"
             >
               <Select mode="multiple">
@@ -365,7 +361,6 @@ const UserP = () => {
               </Form.Item>
               <Form.Item
                 label="Akademik unvoni (Ученое звание):"
-                name="academic_title"
                 key="academic_title"
               >
                 <Select>

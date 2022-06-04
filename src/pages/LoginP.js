@@ -23,24 +23,20 @@ const LoginP = () => {
   const [loginForm] = Form.useForm();
 
   const onFinish = (values) => {
-    console.log(values);
     setSubmitting(true);
     loginUser(values)
       .then((res) => {
-        console.log('asd', res);
         if (res && res.status === 200 && res.data) {
-          console.log(res.data.token);
           setCookie(TOKEN, res.data.token);
           const headers = {
             "Accept": "application/json",
             Authorization: `Bearer ${res.data.token}`,
           };
           axios
-          .get(API_URL + "doctor/information/data/get", {
-            headers,
-          }).then((data) => {
-            console.log(data);
-            window.location.href = "/dashboard";
+            .get(API_URL + "doctor/information/data/get", {
+              headers,
+            }).then(() => {
+              window.location.href = "/dashboard";
             }).catch((err) => {
               console.log(err);
             })
@@ -77,7 +73,7 @@ const LoginP = () => {
       })
       .catch((err) => {
         setSubmitting(false);
-        console.log(err.response);
+        message.error(err.response.data.errors.username ? err.response.data.errors.username : err.response.data.errors.password)
       });
   };
   return (
